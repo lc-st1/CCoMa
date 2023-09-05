@@ -11,7 +11,7 @@ After cloning, move the python file `CCoMa.py` to the project directory. Full pa
 To use CCoMa in a project, add the following line to the python script:
 
 ```python
-from CCoMa import from CCoMa import Cable, CableSet, ContinuumManipulator
+from CCoMa import Cable, CableSet, ContinuumManipulator, generateURDF
 ```
 
 
