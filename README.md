@@ -33,9 +33,9 @@ If there are any issues or bugs, please report these on the repository page or t
 
 Future Features
 -------
--The following features are currently planned for implementation:
--Code Optimization
--Pneumatic Actuator Support
--Physically-based Sensor Models
--Real-time FESTO System Control
+- The following features are currently planned for implementation:
+- Code Optimization
+- Pneumatic Actuator Support
+- Physically-based Sensor Models
+- Real-time FESTO System Control
 
