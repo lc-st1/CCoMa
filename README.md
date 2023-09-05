@@ -39,5 +39,6 @@ The following features are currently planned for implementation:
 - Pneumatic Actuator Support
 - Physically-based Sensor Models
 - Real-time FESTO System Control
+
 Any feature requests should either be added as a discussion/report or sent to Luca Ciampaglia at `lsc65@case.edu`
 
