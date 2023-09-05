@@ -1,6 +1,11 @@
 # CCoMa Documentation
 ### CWRU SME Lab    
 
+
+|Classes:| Functions:|
+|---|---|
+|<ul><li>Cable</li><li>CableSet<ul><li>generateCables</li><li>generateDebugSliders</li><li>readDebugSliders</li></ul></li><li>ActuatorMotor<ul><li>setMotorControl</li><li>stepSimulation</li></ul></li><li>ActuatorPneumatic<ul><li>setMotorControl</li><li>stepSimulation</li></ul></li><li>ContinuumManipulator<ul><li>stepSimulation</li><li>updateSegments</li><li>addNewCableSet</li><li>setSpringConstant</li><li>setCableTensions</li><li>showCables</li><li>hideCables</li><li>showSegmentColors</li><li>hideSegmentColors</li><li>showModel</li><li>hideModel</li><li>addSoftBody</li><li>getMassMatrix</li></ul></li>| <ul><li>multiplyQuaternion</li><li>scaleVector</li><li>vectorAngle</li><li>invertQuaternion</li><li>magnitude</li><li>vecProject</li><li>normalize</li><li>quaternionFromAxisAngle</li><li>applyRotation</li><li>axisAngleFromQuaternion</li><li>jointEulerFromQuaternion</li><li>generateURDF</li></ul>|
+
 # Classes
 
 
