@@ -13,6 +13,7 @@ Cable
 -----
 The Cable is a singular cable that applies force to a manipulator. Each cable has a length, tension, and a list of [xyz] positions. These are relative to the local origin of each manipulator link affected by the cable.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -241,6 +242,7 @@ Calculates the mass matrix of model. May be very large matrix, depends on number
 multiplyQuaternion()
 ```
 Calculate the product of two quaternion inputs. Uses JPL Quaternion Notation [xyzw]. Uses left multiplication (p = q0 * q1)
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -248,10 +250,17 @@ Inputs:
 | required | q0 | vec4 floats | Left quaternion. |
 | required | q1 | vec4 floats | Right quaternion. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| q2 | vec4 floats | Product quaternion. |
+
 ```
 scaleVector()
 ```
 Scales a vector by an arbitrary type numerical scalar.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -259,10 +268,17 @@ Inputs:
 | required | S | numerical type object | Scalar value. |
 | required | v0 | vector of floats | Vector to be scaled. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| v1 | vector of floats | Scaled vector. |
+
 ```
 vectorAngle()
 ```
 Computes the angle between vectors using a cross product.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -270,30 +286,52 @@ Inputs:
 | required | v0 | vector of floats | First vector. |
 | required | v1 | vector of floats | Second vector. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| angle | float | Angle between vectors, in radians. |
+
+
 ```
 invertQuaternion()
 ```
 Inverts a quaternion by negating only the [xyz] values.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | q0 | vec4 of floats | Quaternion to be inverted. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| q1 | vec4 floats | Inverted quaternion. |
+
 ```
 magnitude()
 ```
 Calculates the length of the vector.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | vec | vector of floats | Vector of unknown magnitude. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| magnitude | float | Magnitude of vector. |
+
 ```
 vecProject()
 ```
 Projects the first vector onto the second vector.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -301,36 +339,64 @@ Inputs:
 | required | v0 | vec3 of floats | Vector projected from. |
 | required | v1 | vec3 of floats | Vector projected onto. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| v2 | vec3 of floats | Projection of first vector onto second. |
+
 ```
 normalize()
 ```
 Normalizes a vector to magnitude of 1. 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | v | vector of floats | Vector to be normalized. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| v1 | vector of floats | Normalized vector |
+
 ```
 quaternionFromAxisAngle()
 ```
 Computes a quaternion that represents a rotation around a given [xyz] axis vector of a given radian angle. 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | angle | float | Radian angle of rotation.|
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| quat0 | vec4 of floats | Quaternion [xyzw] |
+
 ```
 applyRotation()
 ```
 Applies a quaternion rotation to an [xyz] vector.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | v | vec3 of floats | Vector to be rotated. |
 | required | q | vec4 of floats | Quaternion representing rotation. |
+
+
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| v | vec3 of floats | Rotated vector. |
 
 ```
 axisAngleFromQuaternion()
@@ -342,6 +408,13 @@ Inputs:
 | --- | --- | --- | --- |
 | required | quat0 | vec4 of floats | Quaternion representing rotation. |
 
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| axis | vec3 of floats | Axis of rotation as [xyz] vector. |
+| angle | float | Angle of rotation in radians. |
+
 ```
 jointEulerFromQuaternion()
 ```
@@ -351,6 +424,12 @@ Inputs:
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | q | vec4 of floats | Quaternion representing rotation. |
+
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| angles | vec3 of floats | Euler angle representation of rotation as [rpy] vector. |
 
 ```
 generateURDF()

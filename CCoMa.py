@@ -392,10 +392,6 @@ class ContinuumManipulator:
         for c in self.cableSets: # color each set of segments differently
             for l in range(c.startLink, c.endLink+1):
                 p.changeVisualShape(self.modelId, linkIndex=l, rgbaColor=c.segmentColor)
-            # if(c.startLink==0):
-            #     p.changeVisualShape(self.modelId, linkIndex=-1, rgbaColor=c.segmentColor)
-            # for l in range(c.startLink, c.endLink):
-            #     p.changeVisualShape(self.modelId, linkIndex=l, rgbaColor=c.segmentColor)
 
     # hide the segment colors
     def hideSegmentColors(self, 
@@ -799,8 +795,3 @@ def generateURDF(
 
         f.write('</robot>') # finish the urdf XML and close the file
         f.close()
-
-# generateURDF(fileName, robotName, radius, numLinks, linkLength, linkMass, automaticSegments, linkInertia, damping):
-# generateURDF("z_gen_test_auto1", "auto1", 0.05,9,1.0,1.0,True,damping=0.05)
-# generateURDF("z_gen_test_auto2", "auto1", 0.05,19,1.0,1.0,True,damping=0.001)
-# generateURDF("z_gen_test5", "genbot1", 0.05, 19, 1.0, 2.0, True,damping= 0.005)
