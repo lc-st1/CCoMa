@@ -154,6 +154,12 @@ class ActuatorMotor:
             print("Control mode not recognized, use p.TORQUE_CONTROL or p.POSITION_CONTROL")
 
     def stepSimulation(self):
+        
+        # Need to remember how to implement a digital PID controller
+        # I dont really know how right now
+        # This is supposed to model a servo pulling the cable to a given target angle, but this has to do that manually
+        # This also doesnt seem necessary right now but idk
+        
         if(self.controlmode == p.TORQUE_CONTROL):
             self.cable.tension = min(self.actuationTorque,self.maxTorque) / self.wheelRadius
         elif(self.controlmode == p.POSITION_CONTROL):
@@ -203,8 +209,14 @@ class ActuatorPneumatic:
 
 
     def stepSimulation(self):
-        #set the tension to a function of all current variables (acutator length, cable length, pressure)
+        # set the tension to a function of all current variables (acutator length, cable length, pressure)
+        # Use a geometric model of the actuator to find the force from the given pressure and actuator state
+        # There is some sort of triangle/trig function that would work
+        # This would be highly dependent on actuator geometry though, it may be better to use an input for a custom function or something
+        # Could just start with example origami actuator and work on generalizing it later
+        cableLength = self.cable.length
         force = self.actuationArea*self.actuationPressure 
+        tension = force * cableLength # This isnt a final function, needs to be replaced
         self.cable.tension = force
     
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------# 
@@ -295,6 +307,11 @@ class ContinuumManipulator:
                                             lastLinkPosRelative[1]-currentLinkPosRelative[1],
                                             lastLinkPosRelative[2]-currentLinkPosRelative[2]]
                     cable.length += magnitude(forceVectorRelative)/3
+                    
+                    # ??????
+                    # Need to add a way to properly estimate cable length, should use some sort of curve algorithm
+                    # Idk why this needs '/3' to work and it really isnt very accurate
+                    
                     forceVector = normalize(applyRotation(forceVectorRelative,invertQuaternion(self.linkStates[l+1][1])))
                     forceVector = scaleVector(cable.tension,forceVector)
                     

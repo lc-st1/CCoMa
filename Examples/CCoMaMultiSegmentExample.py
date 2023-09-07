@@ -2,8 +2,7 @@
 #SME Soft Robotics Lab
 #Case Western Reserve University
 
-#Soft Cable-Driven Continuum Manipulator Simulation
-#Uses CCoMa
+#CCoMa Multi-Segment Manipulator Example
 
 import pybullet as p
 import time
@@ -34,7 +33,7 @@ startOrientation = p.getQuaternionFromEuler([0,0,0]) # Set a start orientation f
 
 # Loads the continuum manipulator from urdf
 # use flags p.URDF_USE_INERTIA_FROM_FILE if you want custom inertias or p.URDF_USE_SELF_COLLISION if you want self collision
-bot = p.loadURDF("example_manipulator_1.urdf",startPos, startOrientation, 0, 1) 
+bot = p.loadURDF("multi_segment_example_manipulator.urdf",startPos, startOrientation, 0, 1) 
 
 numJoints = p.getNumJoints(bot)
 
