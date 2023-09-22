@@ -16,7 +16,7 @@ import CCoMa
 or 
 
 ```python
-from CCoMa import generateURDF, Cable, CableSet, ContinuumManipulator
+from CCoMa import generateURDF, generateURDFAdvanced, Cable, CableSet, ContinuumManipulator
 ```
 
 

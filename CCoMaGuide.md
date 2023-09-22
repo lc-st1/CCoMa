@@ -4,7 +4,7 @@
 
 |_Classes:_|_Functions:_|
 |---|---|
-|<ul><li>Cable</li><li>CableSet<ul><li>generateCables</li><li>generateDebugSliders</li><li>readDebugSliders</li></ul></li><li>ActuatorMotor<ul><li>setMotorControl</li><li>stepSimulation</li></ul></li><li>ActuatorPneumatic<ul><li>setMotorControl</li><li>stepSimulation</li></ul></li><li>ContinuumManipulator<ul><li>stepSimulation</li><li>updateSegments</li><li>addNewCableSet</li><li>setSpringConstant</li><li>setCableTensions</li><li>showCables</li><li>hideCables</li><li>showSegmentColors</li><li>hideSegmentColors</li><li>showModel</li><li>hideModel</li><li>addSoftBody</li><li>getMassMatrix</li></ul></li>| <ul><li>multiplyQuaternion</li><li>scaleVector</li><li>vectorAngle</li><li>invertQuaternion</li><li>magnitude</li><li>vecProject</li><li>normalize</li><li>quaternionFromAxisAngle</li><li>applyRotation</li><li>axisAngleFromQuaternion</li><li>jointEulerFromQuaternion</li><li>generateURDF</li></ul>|
+|<ul><li>Cable</li><li>CableSet<ul><li>generateCables</li><li>generateCablesAdvanced</li><li>generateDebugSliders</li><li>readDebugSliders</li></ul></li><li>ActuatorMotor<ul><li>setMotorControl</li><li>stepSimulation</li></ul></li><li>ActuatorPneumatic<ul><li>setMotorControl</li><li>stepSimulation</li></ul></li><li>ContinuumManipulator<ul><li>stepSimulation</li><li>updateSegments</li><li>addNewCableSet</li><li>setSpringConstant</li><li>setCableTensions</li><li>showCables</li><li>hideCables</li><li>showSegmentColors</li><li>hideSegmentColors</li><li>showModel</li><li>hideModel</li><li>addSoftBody</li><li>getMassMatrix</li></ul></li>| <ul><li>multiplyQuaternion</li><li>scaleVector</li><li>vectorAngle</li><li>invertQuaternion</li><li>magnitude</li><li>vecProject</li><li>normalize</li><li>quaternionFromAxisAngle</li><li>applyRotation</li><li>axisAngleFromQuaternion</li><li>jointEulerFromQuaternion</li><li>generateURDF</li><li>generateURDFAdvanced</li></ul>|
 
 # Classes
 
@@ -12,6 +12,7 @@
 Cable
 -----
 The Cable is a singular cable that applies force to a manipulator. Each cable has a length, tension, and a list of [xyz] positions. These are relative to the local origin of each manipulator link affected by the cable.
+
 
 
 Inputs:
@@ -28,6 +29,7 @@ CableSet
 -----
 The CableSet is a grouping of cables. Each CableSet requires an initial and final link that all cables in the set anchor to. Models affected by the cable set will actuate all links between these two. The positions of each cable are relative to the local frame of the affected links. Models will recolor links according to the set segmentColor.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -42,6 +44,8 @@ Inputs:
 generateCables()
 ```
 Automatically generates a set of Cable objects to use based on given parameters.
+
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -52,9 +56,28 @@ Inputs:
 | required | twist | float | Radian offset of each subsequent link |
 
 ```
+generateCablesAdvanced()
+```
+Automatically generates a set of Cable objects to use based on given parameters. This is for use with manipulators defined by `generateURDFAdvanced()`.
+
+
+Inputs:
+
+| Requirements | Input Name | Input Type | Description |
+| --- | --- | --- | --- |
+| required | radiusBase | float | Distance from the center of the first link on local xy plane |
+| required | radiusEnd | float | Distance from the center of the last link on local xy plane |
+| required | startAngle | float | Initial radian angle of placement from local x axis |
+| required | linkLength | float | Length of each manipulator link |
+| required | twist | float | Radian offset of each subsequent link |
+
+
+```
 generateDebugSliders()
 ```
 Generates UI debug sliders for manually setting Cable tensions.
+
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -70,6 +93,8 @@ Read the value of the UI debug sliders generated and update the Cable tensions a
 ActuatorMotor
 -----
 A model of an electric motor, stepper, or servo. Applies tension to a Cable object as a function of torque and radial distance.
+
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -84,6 +109,7 @@ Inputs:
 setMotorControl()
 ```
 Sets either the output torque directly or uses a PID, feedback, and a desired Cable length. Does not directly actuate motor, only sets control mode for `stepSimulation()`.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -101,6 +127,7 @@ Steps the simulation forces, calculates required torque for position control and
 ActuatorPneumatic (INCOMPLETE)
 -----
 A model of an pneumatic hybrid actuator. Applies tension to a Cable object using air pressure and physical displacement.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -117,6 +144,7 @@ Inputs:
 setMotorControl()
 ```
 Sets the system pressure.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -132,6 +160,7 @@ Steps the simulation forces. Calculates the applied force as a result of pressur
 ContinuumManipulator
 -----
 The ContinuumManipulator is the primary manipulator class. It accepts a PyBullet loaded URDF model as the shape of the manipulator, and a list of CableSets contained within the model. It uses a damped oscillator model to simulate the physical properties of the continuum volume. 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -158,6 +187,7 @@ Creates a Look Up Table (LUT) that defines a list of CableSets that affects each
 addNewCableSet()
 ```
 Adds a new CableSet object to the manipulator.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -168,6 +198,7 @@ Inputs:
 setSpringConstant()
 ```
 Directly sets a new spring constant for use in joint force calculations.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -178,6 +209,7 @@ Inputs:
 setCableTensions()
 ```
 Directly sets new tensions in a given set of cables, similar to `updateCableForces()` but does not utilize actuator formulas.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -204,6 +236,7 @@ Applies the RGBA colors specified by each CableSet object to the affect links. B
 hideSegmentColors()
 ```
 Returns the manipulator link colors to a default grey. Can optionally specify new RGBA color to use.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -224,6 +257,7 @@ Renders all model links as invisible.
 addSoftBody()
 ```
 Intended to add a soft body object for collision simulation. Does not work yet.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -241,7 +275,9 @@ Calculates the mass matrix of model. May be very large matrix, depends on number
 ```
 multiplyQuaternion()
 ```
-Calculate the product of two quaternion inputs. Uses JPL Quaternion Notation [xyzw]. Uses left multiplication (p = q0 * q1)
+Calculate the product of two quaternion 
+Inputs. Uses JPL Quaternion Notation [xyzw]. Uses left multiplication (p = q0 * q1)
+
 
 Inputs:
 
@@ -249,6 +285,7 @@ Inputs:
 | --- | --- | --- | --- |
 | required | q0 | vec4 floats | Left quaternion. |
 | required | q1 | vec4 floats | Right quaternion. |
+
 
 Output:
 
@@ -261,12 +298,14 @@ scaleVector()
 ```
 Scales a vector by an arbitrary type numerical scalar.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | S | numerical type object | Scalar value. |
 | required | v0 | vector of floats | Vector to be scaled. |
+
 
 Output:
 
@@ -279,12 +318,14 @@ vectorAngle()
 ```
 Computes the angle between vectors using a cross product.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | v0 | vector of floats | First vector. |
 | required | v1 | vector of floats | Second vector. |
+
 
 Output:
 
@@ -298,11 +339,13 @@ invertQuaternion()
 ```
 Inverts a quaternion by negating only the [xyz] values.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | q0 | vec4 of floats | Quaternion to be inverted. |
+
 
 Output:
 
@@ -315,11 +358,13 @@ magnitude()
 ```
 Calculates the length of the vector.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | vec | vector of floats | Vector of unknown magnitude. |
+
 
 Output:
 
@@ -332,12 +377,14 @@ vecProject()
 ```
 Projects the first vector onto the second vector.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | v0 | vec3 of floats | Vector projected from. |
 | required | v1 | vec3 of floats | Vector projected onto. |
+
 
 Output:
 
@@ -350,11 +397,13 @@ normalize()
 ```
 Normalizes a vector to magnitude of 1. 
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | v | vector of floats | Vector to be normalized. |
+
 
 Output:
 
@@ -367,11 +416,13 @@ quaternionFromAxisAngle()
 ```
 Computes a quaternion that represents a rotation around a given [xyz] axis vector of a given radian angle. 
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | angle | float | Radian angle of rotation.|
+
 
 Output:
 
@@ -384,12 +435,14 @@ applyRotation()
 ```
 Applies a quaternion rotation to an [xyz] vector.
 
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | v | vec3 of floats | Vector to be rotated. |
 | required | q | vec4 of floats | Quaternion representing rotation. |
+
 
 
 Output:
@@ -402,11 +455,13 @@ Output:
 axisAngleFromQuaternion()
 ```
 Computes the axis-angle representation of a quaternion rotation.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | quat0 | vec4 of floats | Quaternion representing rotation. |
+
 
 Output:
 
@@ -419,11 +474,13 @@ Output:
 jointEulerFromQuaternion()
 ```
 Computes the local Euler angles that represent a quaternion rotation. Uses the order [rpy] ([xyz]), negates the yaw component for use in ContinuumManipulator [xyz] 3DOF joints.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
 | required | q | vec4 of floats | Quaternion representing rotation. |
+
 
 Output:
 
@@ -435,6 +492,7 @@ Output:
 generateURDF()
 ```
 This function generates a `.urdf` file of a continuum manipulator for use with the ContinuumManipulator class in PyBullet. Generated models consist of a number of cylindrical links, specified by numLinks, with a virtual 3DOF [xyz] joint on each end. These consist of overlayed spheres with individual x, y, and z axis revolute joints. The values for length and mass can either be interpreted as per individual link or overall manipulator length/mass. This is specified with `automaticSegments` = `True` or `False`. Generated URDF files will be in the same directory as the script in which this function is called.
+
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
@@ -448,3 +506,51 @@ Inputs:
 | optional | automaticSegments | bool | Option to use length/mass for individual links or overall manipulator, True uses per robot and False uses per link.Default value: False |
 | optional | linkInertia | vec3 of floats | The IXX, IYY, and IZZ inertias of all cylindrical links. Only necessary if custom link inertias are desired.Default value: [0.0,0.0,0.0] |
 | optional | damping | float | The joint damping factor in the URDF file. Values between 0.01 – 0.15 are recommended, determine via experimentation.Default value: 0.1 |
+
+```
+generateURDFAdvanced()
+```
+This function is very similar to `generateURDF`. However, it contains extensions that allow for complex manipulator body geometry. This is specified using the geometricParameters input. This function can generate manipulator bodies with conic, rectangular prismic, and pyramid (rectangular conic) forms. A demonstration of this is included in `CCoMaAdvancedGeometryExample.py` in the `Examples` directory.
+
+
+Inputs:
+
+| Requirements | Input Name | Input Type | Description |
+| --- | --- | --- | --- |
+| required | fileName | string | Name of the generated URDF file, relative file path can be specified as part of name |
+| required | robotName | string | Name of robot within URDF file |
+| required | geometricParameters | list of floats or vectors, first element is string corresponding to geometric solid type | Definition of the geometric shape and required dimensions* |
+| required | numLinks | int | Number of links in body |
+| required | mass | float | Mass of either individual links or overall robot |
+| optional | automaticSegments | bool | Option to use mass for individual links or overall manipulator, True uses per robot and False uses per link.Default value: False |
+| optional | linkInertia | vec3 of floats | The IXX, IYY, and IZZ inertias of all cylindrical links. Only necessary if custom link inertias are desired.Default value: [0.0,0.0,0.0] |
+| optional | damping | float | The joint damping factor in the URDF file. Values between 0.01 – 0.15 are recommended, determine via experimentation.Default value: 0.1 |
+
+*The structure of geometricParameters is as follows:
+```python
+[ 'geometry_type', dimension 1, dimension 2, ... , dimension N]
+```
+
+`geometry_type` can be one of two possible 
+Inputs: `conic` or `rect_adv`. These have the following dimensional 
+Inputs:
+
+
+`conic `
+
+| 
+Inputs | Description |
+|---|---|
+| base radius | radius of the conic section at the base of the body
+| end radius | radius of the conic section at the end of the body
+| z length | length of the body
+
+`rect_adv `
+
+| 
+Inputs | Description |
+|---|---|
+| base [x,y] widths | x and y width of the rectangular conic section at the base of the body
+| end [x,y] widths | x and y width of the rectangular conic section at the end of the body
+| z length | length of the body
+

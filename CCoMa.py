@@ -20,6 +20,7 @@
     # applyRotation()
     # axisAngleFromQuaternion()
     # generateURDF()
+    # generateURDFAdvanced()
 
 # This is intended for use with Pybullet
 
@@ -64,7 +65,7 @@ class CableSet:
             self.startLink = -1
         else:
             self.startLink = 3 * startLink
-        self.endLink = 3*int(endLink)
+        self.endLink = int(endLink)
         self.numCables = int(numCables)
         self.cables = cables
         self.segmentColor = segmentColor
@@ -83,6 +84,29 @@ class CableSet:
         for c in range(self.numCables):
             positions = []
             for p in range(self.endLink+1-self.startLink):
+                linkpos = [radius * math.cos(startAngle + c * angleInc + p * twist),
+                           radius * math.sin(startAngle + c * angleInc + p * twist),
+                           linkLength
+                           ]
+                positions.append(linkpos)
+            self.cables.append(Cable(self.endLink-self.startLink,positions,0.0, [0.0,0.0,0.0]))
+
+    # generate positions for each cable based on equal spacing around a circle, for use with advanced geometry manipulators
+    def generateCablesAdvanced(self, 
+                       radiusBase, # xy distance from the cables to the center of the base link
+                       radiusEnd,  # xy distance from the cables to the center of the final link
+                       startAngle, # initial radian angle of cable 0 
+                       linkLength, # length of manipulator links
+                       twist # radian angle offset of cables between links
+                       ):
+        self.cables = []
+        angleInc = 2 * math.pi / self.numCables
+        for c in range(self.numCables):
+            positions = []
+            t = 0
+            for p in range(self.endLink+1-self.startLink):
+                t = (p)/(self.endLink-self.startLink)
+                radius = radiusBase*(1-t) + radiusEnd*t
                 linkpos = [radius * math.cos(startAngle + c * angleInc + p * twist),
                            radius * math.sin(startAngle + c * angleInc + p * twist),
                            linkLength
@@ -373,6 +397,7 @@ class ContinuumManipulator:
             for s in self.cableSets:
                 for cable in s.cables:
                     for l in range(s.startLink,s.endLink+1):
+                        print(l)
                         if((l+1)%3 == 0):
                             if(l==-1):
                                 prevp = [cable.positions[l+1-(s.startLink+1)][0],
@@ -386,6 +411,9 @@ class ContinuumManipulator:
                             currp = [cable.positions[l+1-(s.startLink+1)][0],
                                      cable.positions[l+1-(s.startLink+1)][1],
                                      -cable.positions[l+1-(s.startLink+1)][2]+0.5*self.linkLength]
+                            # print(l)
+                            # print(str(prevp))
+                            # print(str(currp))
                             self.drawnCables.append(p.addUserDebugLine(lineFromXYZ=prevp,
                                                                     lineToXYZ=currp,
                                                                     lineColorRGB=cable.debugRenderColor,
@@ -812,3 +840,316 @@ def generateURDF(
 
         f.write('</robot>') # finish the urdf XML and close the file
         f.close()
+        
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------# 
+
+# Generates a URDF file describing a continuum manipulator using combined xyz joints
+# More advanced version with tapered or varied geometry and joint kinematics
+def generateURDFAdvanced(
+                fileName,               # name of the URDF file, resulting file will be "filename.urdf"
+                robotName,              # name of the robot as specified within the URDF file
+                geometricParameters,    # first index is geometry type, remaining parameters are required dimensions
+                numLinks,       # number of moveable links (after the base link)
+                mass,       # mass of each link or overall mass
+                automaticSegments = False, # Use mass for each link or for entire robot, divided evenly between links (false is for segments, true for entire robot)
+                linkInertia = [0.0,0.0,0.0],    # inertia tensor of each link, in [ixx,iyy,izz] format (can be [0,0,0] if model will not use inertia from file)
+                damping=0.1     # joint damping of each link, values around 0.05-0.15 work well (tune based on manipulator dynamics)
+                ):
+     
+    
+    if(automaticSegments):
+        linkMass = mass/(numLinks+1)
+    elif(not automaticSegments):
+        linkMass = mass
+         
+    
+    
+    # GEOMETRIC PARAMETERS:
+    # 'conic', 'rect_conic'
+    
+    geometry = geometricParameters[0]
+    if(geometry == 'conic'):
+        # GEOMETRIC PARAMETERS STRUCTURE:
+        # ['conic', base radius, end radius, length]
+        linkLength = geometricParameters[3]/(numLinks+1)
+        print('conic')
+        def writeLinkShapes(
+                            f,  # write cursor (f)
+                            i   # index of link/joint, from -1 to numLinks-1
+                            ):
+            f.write('\t\t<visual name=\"\">\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+            f.write(str(round(-0.5*linkLength,4)))
+            f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<cylinder radius=\"')
+            # Must scale each cylindrical link to fit overall conic shape (LERP?)
+            t = (i + 1)/(numLinks+1)
+            radius = geometricParameters[1]*(1-t) + geometricParameters[2]*t
+            f.write(str(radius))
+            f.write('\" length=\"')
+            f.write(str(linkLength))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t\t<material name=\"\">\n')
+            f.write('\t\t\t\t<color rgba=\"0.6 0.6 0.6 1.0\"/>\n')
+            f.write('\t\t\t\t<texture filename=\"\"/>\n')
+            f.write('\t\t\t</material>\n')
+            f.write('\t\t</visual>\n')
+
+            f.write('\t\t<collision>\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+            f.write(str(round(-0.5*linkLength,4)))
+            f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<cylinder radius=\"')
+            f.write(str(radius))
+            f.write('\" length=\"')
+            f.write(str(linkLength))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t</collision>\n')
+            
+        def writeJointShapes(
+                            f,  # write cursor (f)
+                            i   # index of link/joint
+                            ):
+            f.write('\t\t<visual name=\"\">\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 0.0\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<sphere radius=\"')
+            t = (i)/(numLinks)
+            radius = geometricParameters[1]*(1-t) + geometricParameters[2]*t
+            f.write(str(radius))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t\t<material name=\"\">\n')
+            f.write('\t\t\t\t<color rgba=\"0.6 0.6 0.6 1.0\"/>\n')
+            f.write('\t\t\t\t<texture filename=\"\"/>\n')
+            f.write('\t\t\t</material>\n')
+            f.write('\t\t</visual>\n')
+
+            f.write('\t\t<collision>\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 0.0\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<sphere radius=\"')
+            f.write(str(radius))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t</collision>\n')
+                      
+    elif(geometry == 'rect_adv'):
+        # GEOMETRIC PARAMETERS STRUCTURE:
+        # ['rect_adv', base [x,y] widths, end [x,y] widths, z length]
+        linkLength = geometricParameters[3]/(numLinks+1)
+        print('rect_adv')
+        def writeLinkShapes(
+                            f,  # write cursor (f)
+                            i   # index of link/joint
+                            ):
+            f.write('\t\t<visual name=\"\">\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+            f.write(str(round(-0.5*linkLength,4)))
+            f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<box size=\"')
+            t = (i + 1)/(numLinks+1)
+            xwidth = geometricParameters[1][0]*(1-t) + geometricParameters[2][0]*t
+            f.write(str(xwidth))
+            f.write(' ')
+            ywidth = geometricParameters[1][1]*(1-t) + geometricParameters[2][1]*t
+            f.write(str(ywidth))
+            f.write(' ')
+            f.write(str(linkLength))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t\t<material name=\"\">\n')
+            f.write('\t\t\t\t<color rgba=\"0.6 0.6 0.6 1.0\"/>\n')
+            f.write('\t\t\t\t<texture filename=\"\"/>\n')
+            f.write('\t\t\t</material>\n')
+            f.write('\t\t</visual>\n')
+
+            f.write('\t\t<collision>\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+            f.write(str(round(-0.5*linkLength,4)))
+            f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<box size=\"')
+            xwidth = geometricParameters[1][0]*(1-t) + geometricParameters[2][0]*t
+            f.write(str(xwidth))
+            f.write(' ')
+            ywidth = geometricParameters[1][1]*(1-t) + geometricParameters[2][1]*t
+            f.write(str(ywidth))
+            f.write(' ')
+            f.write(str(linkLength))
+            f.write('\"/>\n')
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t</collision>\n')
+            
+        def writeJointShapes(
+                            f,  # write cursor (f)
+                            i   # index of link/joint
+                            ):
+            f.write('\t\t<visual name=\"\">\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 0.0\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<box size=\"')
+            t = (i)/(numLinks)
+            xwidth = geometricParameters[1][0]*(1-t) + geometricParameters[2][0]*t
+            f.write(str(xwidth))
+            f.write(' ')
+            ywidth = geometricParameters[1][1]*(1-t) + geometricParameters[2][1]*t
+            f.write(str(ywidth))
+            f.write(' ')
+            f.write(str(min(xwidth,ywidth)))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t\t<material name=\"\">\n')
+            f.write('\t\t\t\t<color rgba=\"0.6 0.6 0.6 1.0\"/>\n')
+            f.write('\t\t\t\t<texture filename=\"\"/>\n')
+            f.write('\t\t\t</material>\n')
+            f.write('\t\t</visual>\n')
+
+            f.write('\t\t<collision>\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 0.0\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<geometry>\n')
+            f.write('\t\t\t\t<box size=\"')
+            xwidth = geometricParameters[1][0]*(1-t) + geometricParameters[2][0]*t
+            f.write(str(xwidth))
+            f.write(' ')
+            ywidth = geometricParameters[1][1]*(1-t) + geometricParameters[2][1]*t
+            f.write(str(ywidth))
+            f.write(' ')
+            f.write(str(min(xwidth,ywidth)))
+            f.write('\"/>\n')
+            f.write('\t\t\t</geometry>\n')
+            f.write('\t\t</collision>\n')
+            
+   
+    
+    name = fileName + ".urdf" # generate the file name with appended .urdf
+    with open(name, 'w') as f: # open and clear the file (makes file if it does not already exist)
+        initLine = '<robot name=\"' + robotName + '\">\n\n'  # start the urdf XML
+        f.write(initLine)
+        f.close()
+
+    with open(name, 'a') as f: # reopen the created file in append mode to create the robot definition
+        f.write('\t <link name=\"link_-1\">\n') # generates the base link special at xyz=0.0 0.0 0.0
+
+        f.write('\t\t<inertial>\n')
+        f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+        f.write(str(round(-0.5*linkLength,4)))
+        f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+        f.write('\t\t\t<mass value=\"')
+        f.write(str(linkMass))
+        f.write('\"/>\n')
+        inertiaLine = '\t\t\t<inertia '+ 'ixx=\"' + str(linkInertia[0]) + '\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"' + str(linkInertia[1]) + '\" iyz=\"0.0\" izz=\"' +str(linkInertia[2]) + '\"/>\n'
+        f.write(inertiaLine)
+        f.write('\t\t</inertial>\n')
+
+        writeLinkShapes(f,-1)
+        
+        f.write('\t</link>\n\n')
+
+        axes = ['x','y','z']
+        axisvecs = ['1.0 0.0 0.0', '0.0 1.0 0.0', '0.0 0.0 1.0']
+
+        for l in range(numLinks): # generates all the remaining links and calculates position values automatically
+            for j in range(2):
+                f.write('\t<link name=\"link_')
+                f.write(str(l))
+                f.write('_')
+                f.write(axes[j])
+                f.write('\">\n')
+
+                f.write('\t\t<inertial>\n')
+                f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+                f.write('0.0')
+                f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+
+                f.write('\t\t\t<mass value=\"0.00001\"/>\n')
+                f.write('\t\t\t<inertia ixx=\"0.0000001\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"0.0000001\" iyz=\"0.0\" izz=\"0.0000001\"/>\n')
+                f.write('\t\t</inertial>\n')
+
+                writeJointShapes(f,l)
+
+                f.write('\t</link>\n\n')
+
+
+
+            f.write('\t<link name=\"link_')
+            f.write(str(l))
+            f.write('\">\n')
+
+            f.write('\t\t<inertial>\n')
+            f.write('\t\t\t<origin xyz=\"0.0 0.0 ')
+            f.write(str(round(-0.5*linkLength,4)))
+            # f.write('0.0')
+            f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+            f.write('\t\t\t<mass value=\"')
+            f.write(str(linkMass))
+            f.write('\"/>\n')
+            inertiaLine = '\t\t\t<inertia '+ 'ixx=\"' + str(linkInertia[0]) + '\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"' + str(linkInertia[1]) + '\" iyz=\"0.0\" izz=\"' +str(linkInertia[2]) + '\"/>\n'
+            f.write(inertiaLine)
+            f.write('\t\t</inertial>\n')
+
+            writeLinkShapes(f,l)
+            
+            f.write('\t</link>\n\n')
+
+        for j in range(numLinks): # generates all joints and calculates positions automatically
+            
+            for i in range(3):
+                f.write('\t<joint name=\"joint_')
+                f.write(str(j))
+                f.write('_')
+                f.write(axes[i])
+                f.write('\" type=\"')
+                if(i<2):
+                    f.write('revolute')
+                else:
+                    f.write('continuous') 
+                f.write('\">\n')
+
+                f.write('\t\t<origin xyz=\"0.0 0.0 ')
+                if(i<1):
+                    f.write(str(round(-1*linkLength,4)))
+                else:
+                    f.write('0.0')
+                f.write('\" rpy=\"0.0 0.0 0.0\"/>\n')
+
+                f.write('\t\t<parent link=\"link_')
+                if(i==0):
+                    f.write(str(j-1))
+                else:
+                    f.write(str(j))
+                    f.write('_')
+                    f.write(axes[i-1])
+                f.write('\"/>\n')
+
+                f.write('\t\t<child link=\"link_')
+                f.write(str(j))
+                if(i<2):
+                    f.write('_')
+                    f.write(axes[i])
+                f.write('\"/>\n')
+
+
+                f.write('\t\t<axis xyz=\"')
+                f.write(axisvecs[i])
+                f.write('\"/>\n')
+                if(i<2):
+                    f.write('\t\t<limit lower=\"-1.57\" upper=\"1.57\" effort=\"1000\" velocity=\"20\"/>\n')
+                f.write('\t\t<dynamics damping=\"')
+                f.write(str(damping))
+                # f.write('\" friction=\"0.04\"/>\n')
+                f.write('\"/>\n')
+                f.write('\t</joint>\n\n')
+
+        f.write('</robot>') # finish the urdf XML and close the file
+        f.close()
+        
+# May need to update CableSet as well to generate positions with tapers
