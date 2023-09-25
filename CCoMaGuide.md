@@ -254,15 +254,15 @@ hideModel()
 Renders all model links as invisible.
 
 ```
-addSoftBody()
+changeDynamics()
 ```
-Intended to add a soft body object for collision simulation. Does not work yet.
+Changes the physical properties of all links in a manipulator. Takes an input `**kwargs` that contains the parameter to change and the desired value. See the Pybullet documentation for a list of parameters and definitions.
 
 Inputs:
 
 | Requirements | Input Name | Input Type | Description |
 | --- | --- | --- | --- |
-| required | softBodyID | int | Pybullet object ID of soft body object. |
+| required | kwargs | parameter keys and values | Desired parameters to update and new values |
 
 ```
 getMassMatrix()
@@ -538,8 +538,7 @@ Inputs:
 
 `conic `
 
-| 
-Inputs | Description |
+| Inputs | Description |
 |---|---|
 | base radius | radius of the conic section at the base of the body
 | end radius | radius of the conic section at the end of the body
@@ -547,10 +546,34 @@ Inputs | Description |
 
 `rect_adv `
 
-| 
-Inputs | Description |
+| Inputs | Description |
 |---|---|
 | base [x,y] widths | x and y width of the rectangular conic section at the base of the body
 | end [x,y] widths | x and y width of the rectangular conic section at the end of the body
 | z length | length of the body
 
+
+
+```
+mergeManipulators()
+```
+Merges a group of `ContinuumManipulator` objects. Joins a list of `ContinuumManipulator` objects to a given base Pybullet Unique ID at a specified link and local position/orientation.
+
+
+Inputs:
+
+| Requirements | Input Name | Input Type | Description |
+| --- | --- | --- | --- |
+| required | base | int | Pybullet ID of base object |
+| required | baseLink | int | Target link of base object, -1 for root link |
+| required | manipulators | vector of `ContinuumManipulator` objects| List of manipulators to be merged to base object |
+| required | positions | vector of vec3 floats | Local position of each joined manipulator to the base |
+| required | orientations | vector of vec4 floats | Local orientation of each joined manipulator to the base |
+
+
+
+Output:
+
+| Output Name | Output Type | Description |
+| --- | --- | --- | 
+| constraints | list of ints | List of Pybullet Unique IDs of all generated connective joints |

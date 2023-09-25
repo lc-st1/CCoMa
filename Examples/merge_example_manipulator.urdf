@@ -177,7 +177,7 @@
 		<visual name="">
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.05000000000000001"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.6 0.6 0.6 1.0"/>
@@ -187,7 +187,7 @@
 		<collision>
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.05000000000000001"/>
 			</geometry>
 		</collision>
 	</link>
@@ -201,7 +201,7 @@
 		<visual name="">
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.05000000000000001"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.6 0.6 0.6 1.0"/>
@@ -211,7 +211,7 @@
 		<collision>
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.05000000000000001"/>
 			</geometry>
 		</collision>
 	</link>
@@ -249,7 +249,7 @@
 		<visual name="">
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.049999999999999996"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.6 0.6 0.6 1.0"/>
@@ -259,7 +259,7 @@
 		<collision>
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.049999999999999996"/>
 			</geometry>
 		</collision>
 	</link>
@@ -273,7 +273,7 @@
 		<visual name="">
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.049999999999999996"/>
 			</geometry>
 			<material name="">
 				<color rgba="0.6 0.6 0.6 1.0"/>
@@ -283,7 +283,7 @@
 		<collision>
 			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
 			<geometry>
-				<sphere radius="0.05"/>
+				<sphere radius="0.049999999999999996"/>
 			</geometry>
 		</collision>
 	</link>

@@ -21,6 +21,7 @@
     # axisAngleFromQuaternion()
     # generateURDF()
     # generateURDFAdvanced()
+    # mergeManipulators()
 
 # This is intended for use with Pybullet
 
@@ -397,7 +398,6 @@ class ContinuumManipulator:
             for s in self.cableSets:
                 for cable in s.cables:
                     for l in range(s.startLink,s.endLink+1):
-                        print(l)
                         if((l+1)%3 == 0):
                             if(l==-1):
                                 prevp = [cable.positions[l+1-(s.startLink+1)][0],
@@ -453,12 +453,12 @@ class ContinuumManipulator:
     def hideModel(self):
         self.hideSegmentCOlors(modelColor=[1.0,1.0,1.0,0.0])
 
-    # move a soft body using this setup? (p.createSoftBodyAnchor(int softBodyUniqueId, int nodeIndex, int bodyUniqueId, int linkIndex, const double bodyFramePosition[3]);
-    def addSoftBody(self, 
-                    softBodyID
-                    ):
-        # do something here idk
-        print("addSoftBody not finished")
+    # update dynamics properties of entire model at once
+    def changeDynamics(self,
+                       **kwargs
+                       ):
+        for l in range(self.numJoints+1):
+            p.changeDynamics(self.modelId, l-1, **kwargs)
 
     # find the mass matrix of the manipulator in the current state
     def getMassMatrix(self):
@@ -962,7 +962,7 @@ def generateURDFAdvanced(
             ywidth = geometricParameters[1][1]*(1-t) + geometricParameters[2][1]*t
             f.write(str(ywidth))
             f.write(' ')
-            f.write(str(linkLength))
+            f.write(str(0.5*linkLength))
             f.write('\"/>\n')
             f.write('\t\t\t</geometry>\n')
             f.write('\t\t\t<material name=\"\">\n')
@@ -1023,7 +1023,7 @@ def generateURDFAdvanced(
             ywidth = geometricParameters[1][1]*(1-t) + geometricParameters[2][1]*t
             f.write(str(ywidth))
             f.write(' ')
-            f.write(str(min(xwidth,ywidth)))
+            f.write(str(linkLength/2))
             f.write('\"/>\n')
             f.write('\t\t\t</geometry>\n')
             f.write('\t\t</collision>\n')
@@ -1153,3 +1153,22 @@ def generateURDFAdvanced(
         f.close()
         
 # May need to update CableSet as well to generate positions with tapers
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------# 
+
+# Merges multiple ContinuumManipulator models onto a single base object link (for creating complex set shapes)
+# ContinuumManipulator objects used should not have fixed bases
+def mergeManipulators(
+                base,               # the base object to connect all manipulators to
+                baseLink,           # which link of the base object to connect to (-1 for origin)
+                manipulators,       # list of ContinuumManipulator objects to merge with
+                positions,          # positions of all manipulator origins relative to local base reference frame
+                orientations,       # orientations of all manipulators relative to the local base orientation
+                ):
+    
+    constraints = []
+    # createConstraint(parentID, parentLinkID, childID, childLinkID, jointtype, jointaxis, prentFramePos, childFramePos, parentFramOr, childFrameOr)
+    for m in range(len(manipulators)):
+        constraints.append(p.createConstraint(base, baseLink, manipulators[m].modelId, -1, p.JOINT_FIXED, [0,0,0], positions[m],[0,0,0],orientations[m]))
+    
+    return constraints

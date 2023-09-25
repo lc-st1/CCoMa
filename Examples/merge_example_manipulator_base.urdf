@@ -1,0 +1,28 @@
+<robot name="advancedbot">
+
+	 <link name="link_-1">
+		<inertial>
+			<origin xyz="0.0 0.0 -0.05" rpy="0.0 0.0 0.0"/>
+			<mass value="2.0"/>
+			<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+		</inertial>
+		<visual name="">
+			<origin xyz="0.0 0.0 -0.05" rpy="0.0 0.0 0.0"/>
+			<geometry>
+				<box size="1.0 1.0 0.05"/>
+			</geometry>
+			<material name="">
+				<color rgba="0.6 0.6 0.6 1.0"/>
+				<texture filename=""/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0.0 0.0 -0.05" rpy="0.0 0.0 0.0"/>
+			<geometry>
+				<box size="1.0 1.0 0.1"/>
+"/>
+			</geometry>
+		</collision>
+	</link>
+
+</robot>
